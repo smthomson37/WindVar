@@ -149,4 +149,3 @@ def windspeed_year(csv_location:str, distance:str, title:str):
     plt.legend();
     fig1 = fig
     return fig1
-
