@@ -149,3 +149,57 @@ def windspeed_year(csv_location:str, distance:str, title:str):
     plt.legend();
     fig1 = fig
     return fig1
+
+
+def make_temperature_graph(input_csv: str, save_location: str, distance: str, title: str):
+    csv = pd.read_csv(input_csv)
+    wind_speed = csv[
+        ['Year', 'Month', 'Day', 'Hour', 'Minute', 'air temperature at 10m (C)', 'air temperature at 40m (C)',
+         'air temperature at 60m (C)', 'air temperature at 80m (C)', 'air temperature at 100m (C)',
+         'air temperature at 120m (C)', 'wind speed at 140m (m/s)', 'air temperature at 160m (C)',
+         'air temperature at 200m (C)']].copy()
+    wind_speed.rename(columns={'Year': 'Year', 'Month': 'Month', 'Day': 'Day', 'Hour': 'Hour', 'Minute': 'Minute',
+                               'air temperature at 10m (C)': 'c10', 'air temperature at 40m (C)': 'c40',
+                               'air temperature at 60m (C)': 'c60', 'air temperature at 80m (C)': 'c80',
+                               'air temperature at 100m (C)': 'c100', 'air temperature at 120m (C)': 'c120',
+                               'air temperature at 140m (C)': 'c140', 'air temperature at 160m (C)': 'c160',
+                               'air temperature at 200m (C)': 'c200'}, inplace=True)
+    wind_speed['Date-Time'] = pd.to_datetime(wind_speed[['Year', 'Month', 'Day', 'Hour']])
+    grouped_by_hour = wind_speed.groupby(['Month', 'Hour']).mean()
+    grouped_by_hour.reset_index(inplace=True)
+    jan = grouped_by_hour.loc[grouped_by_hour['Month'] == 1]
+    feb = grouped_by_hour.loc[grouped_by_hour['Month'] == 2]
+    mar = grouped_by_hour.loc[grouped_by_hour['Month'] == 3]
+    apr = grouped_by_hour.loc[grouped_by_hour['Month'] == 4]
+    may = grouped_by_hour.loc[grouped_by_hour['Month'] == 5]
+    jun = grouped_by_hour.loc[grouped_by_hour['Month'] == 6]
+    jul = grouped_by_hour.loc[grouped_by_hour['Month'] == 7]
+    aug = grouped_by_hour.loc[grouped_by_hour['Month'] == 8]
+    sep = grouped_by_hour.loc[grouped_by_hour['Month'] == 9]
+    oct = grouped_by_hour.loc[grouped_by_hour['Month'] == 10]
+    nov = grouped_by_hour.loc[grouped_by_hour['Month'] == 11]
+    dec = grouped_by_hour.loc[grouped_by_hour['Month'] == 12]
+    fig, ax = plt.subplots(1, 1, figsize=(18, 12))
+
+
+    # plot lines
+    plt.plot(jan.Hour, jan[distance], label="January")
+    plt.plot(feb.Hour, feb[distance], label="February")
+    plt.plot(mar.Hour, mar[distance], label="March")
+    plt.plot(apr.Hour, apr[distance], label="April")
+    plt.plot(may.Hour, may[distance], label="May")
+    plt.plot(jun.Hour, jun[distance], label="June")
+    plt.plot(jul.Hour, jul[distance], label="July")
+    plt.plot(aug.Hour, aug[distance], label="August")
+    plt.plot(sep.Hour, sep[distance], label="September")
+    plt.plot(oct.Hour, aug[distance], label="October")
+    plt.plot(nov.Hour, nov[distance], label="November")
+    plt.plot(dec.Hour, dec[distance], label="December")
+    plt.legend()
+
+    plt.title(title)
+    plt.xlabel("Hour")
+    plt.ylabel("Air Temperature in C")
+    graph = plt.show()
+    plt.savefig(save_location)
+    return graph
